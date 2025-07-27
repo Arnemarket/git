@@ -1,0 +1,3037 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envanter ve Kargo Yönetim Sistemi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            font-weight: bold;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .page-content {
+            padding: 20px;
+            min-height: calc(100vh - 76px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #229954);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 16px;
+            color: white;
+        }
+
+        .color-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 2px;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .color-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .color-circle.selected {
+            border: 3px solid var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .tag-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .product-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+
+        .product-card.selected {
+            border-color: var(--secondary-color);
+            background: #f8f9fa;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            background: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .category-section {
+            margin: 10px 0;
+        }
+
+        .category-header {
+            background: var(--light-bg);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: #d5dbdb;
+        }
+
+        .filter-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .log-entry {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .log-entry.positive {
+            border-left-color: var(--success-color);
+        }
+
+        .log-entry.negative {
+            border-left-color: var(--accent-color);
+        }
+
+        .shipping-cost-box {
+            background: linear-gradient(135deg, var(--success-color), #229954);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .page-content {
+                padding: 10px;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .navbar-nav {
+                text-align: center;
+            }
+            
+            .login-card {
+                margin: 20px;
+            }
+            
+            .btn-custom {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" id="mainNavbar" style="display: none;">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-boxes"></i> Envanter Sistemi</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('products')">
+                            <i class="fas fa-plus-circle"></i> Ürün Kayıt
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('stock')">
+                            <i class="fas fa-warehouse"></i> Stok Takip
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('history')">
+                            <i class="fas fa-history"></i> İşlem Geçmişi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('shipping')">
+                            <i class="fas fa-shipping-fast"></i> Kargolama
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('shipping-history')">
+                            <i class="fas fa-truck"></i> Kargo Geçmişi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('settings')">
+                            <i class="fas fa-cogs"></i> Ayarlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('logbook')">
+                            <i class="fas fa-book"></i> Kayıt Defteri
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user"></i> <span id="currentUser">Admin</span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Çıkış
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <i class="fas fa-boxes fa-3x text-primary mb-3"></i>
+                <h3>Envanter Yönetim Sistemi</h3>
+                <p class="text-muted">Giriş yapın veya yeni kullanıcı oluşturun</p>
+            </div>
+            
+            <div id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-user"></i> Kullanıcı Adı</label>
+                    <input type="text" class="form-control" id="loginUsername" placeholder="Kullanıcı adınızı girin">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><i class="fas fa-lock"></i> Şifre</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Şifrenizi girin">
+                </div>
+                <button class="btn btn-custom w-100 mb-3" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                </button>
+                <button class="btn btn-outline-secondary w-100" onclick="showRegisterForm()">
+                    <i class="fas fa-user-plus"></i> Yeni Kullanıcı Oluştur
+                </button>
+            </div>
+
+            <div id="registerForm" class="hidden">
+                <h5 class="mb-3">Yeni Kullanıcı Oluştur</h5>
+                <div class="mb-3">
+                    <label class="form-label">Admin Kullanıcı Adı</label>
+                    <input type="text" class="form-control" id="adminUsername" placeholder="Mevcut admin kullanıcı adı">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Admin Şifre</label>
+                    <input type="password" class="form-control" id="adminPassword" placeholder="Admin şifresi">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Yeni Kullanıcı Adı</label>
+                    <input type="text" class="form-control" id="newUsername" placeholder="Yeni kullanıcı adı">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Yeni Şifre</label>
+                    <input type="password" class="form-control" id="newPassword" placeholder="Yeni şifre">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Şifre Tekrar</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Şifreyi tekrar girin">
+                </div>
+                <button class="btn btn-success w-100 mb-2" onclick="register()">
+                    <i class="fas fa-user-plus"></i> Kullanıcı Oluştur
+                </button>
+                <button class="btn btn-outline-secondary w-100" onclick="showLoginForm()">
+                    <i class="fas fa-arrow-left"></i> Giriş Sayfasına Dön
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalProducts">0</div>
+                        <div>Toplam Ürün</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalStock">0</div>
+                        <div>Toplam Stok</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalShipments">0</div>
+                        <div>Toplam Kargo</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalRevenue">₺0</div>
+                        <div>Toplam Ciro</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-line"></i> Son İşlemler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentTransactions">
+                                <p class="text-muted">Henüz işlem bulunmuyor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-exclamation-triangle"></i> Düşük Stok Uyarısı</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="lowStockAlerts">
+                                <p class="text-muted">Düşük stok uyarısı yok.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Page -->
+    <div id="productsPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-plus-circle"></i> Ürün Kayıt</h2>
+            
+            <div class="row">
+                <!-- Left Panel - Product List -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-list"></i> Mevcut Ürünler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="productSearch" placeholder="Ürün ara..." onkeyup="searchProducts()">
+                            </div>
+                            <div id="productList" style="max-height: 600px; overflow-y: auto;">
+                                <!-- Products will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Product Form -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 id="productFormTitle"><i class="fas fa-plus"></i> Yeni Ürün Ekle</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="productForm">
+                                <input type="hidden" id="editingProductId" value="">
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ürün Adı *</label>
+                                            <input type="text" class="form-control" id="productName" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Fiyat (₺) *</label>
+                                            <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Kategori</label>
+                                            <div class="input-group">
+                                                <select class="form-select" id="productCategory">
+                                                    <option value="">Kategori seçin</option>
+                                                </select>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="showCategoryModal()">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Marka</label>
+                                            <div class="input-group">
+                                                <select class="form-select" id="productBrand">
+                                                    <option value="">Marka seçin</option>
+                                                </select>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="showBrandModal()">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Özellikler (Etiketler)</label>
+                                    <div class="d-flex flex-wrap mb-2" id="selectedTags"></div>
+                                    <div class="input-group">
+                                        <select class="form-select" id="availableTags" multiple>
+                                        </select>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="showTagModal()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Renk</label>
+                                    <div class="d-flex flex-wrap align-items-center mb-2" id="colorSelection">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="showColorModal()">
+                                            <i class="fas fa-plus"></i> Yeni Renk
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Genişlik (cm)</label>
+                                            <input type="number" class="form-control" id="productWidth" step="0.1" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Yükseklik (cm)</label>
+                                            <input type="number" class="form-control" id="productHeight" step="0.1" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Derinlik (cm)</label>
+                                            <input type="number" class="form-control" id="productDepth" step="0.1" min="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ağırlık (kg)</label>
+                                            <input type="number" class="form-control" id="productWeight" step="0.01" min="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Fotoğraf</label>
+                                    <input type="file" class="form-control" id="productPhoto" accept="image/*" multiple>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-custom">
+                                        <i class="fas fa-save"></i> Kaydet
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="resetProductForm()">
+                                        <i class="fas fa-times"></i> İptal
+                                    </button>
+                                    <button type="button" class="btn btn-danger-custom" id="deleteProductBtn" style="display: none;" onclick="deleteProduct()">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Management Page -->
+    <div id="stockPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-warehouse"></i> Stok Takip</h2>
+            
+            <div class="row">
+                <!-- Left Panel - Product Selection -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-search"></i> Ürün Seçimi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="stockProductSearch" placeholder="Ürün ara..." onkeyup="searchStockProducts()">
+                            </div>
+                            
+                            <!-- Filter Panel -->
+                            <div class="filter-panel">
+                                <h6><i class="fas fa-filter"></i> Filtreler</h6>
+                                <div id="stockFilters">
+                                    <!-- Filters will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Category Sections -->
+                            <div id="stockCategories" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Categories and products will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="col-md-6">
+                    <!-- Selected Products -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-shopping-cart"></i> Seçilen Ürünler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="selectedStockProducts" style="max-height: 300px; overflow-y: auto;">
+                                <p class="text-muted">Henüz ürün seçilmedi.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Adjustment Log -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-clipboard-list"></i> İşlem Kayıtları</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="stockAdjustmentLog" style="max-height: 300px; overflow-y: auto;">
+                                <p class="text-muted">Henüz işlem yapılmadı.</p>
+                            </div>
+                            <button class="btn btn-custom w-100 mt-3" onclick="saveStockAdjustments()">
+                                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History Page -->
+    <div id="historyPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-history"></i> İşlem Geçmişi</h2>
+            
+            <div class="row">
+                <!-- Outgoing Products -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-arrow-up text-danger"></i> Giden Ürünler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="outgoingTransactions" style="max-height: 600px; overflow-y: auto;">
+                                <p class="text-muted">Henüz giden ürün kaydı yok.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incoming Products -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-arrow-down text-success"></i> Gelen Ürünler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="incomingTransactions" style="max-height: 600px; overflow-y: auto;">
+                                <p class="text-muted">Henüz gelen ürün kaydı yok.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping Page -->
+    <div id="shippingPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-shipping-fast"></i> Kargolama</h2>
+            
+            <div class="row">
+                <!-- Left Panel - Product Selection -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-search"></i> Ürün Seçimi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="shippingProductSearch" placeholder="Ürün ara..." onkeyup="searchShippingProducts()">
+                            </div>
+                            
+                            <!-- Filter Panel -->
+                            <div class="filter-panel">
+                                <h6><i class="fas fa-filter"></i> Filtreler</h6>
+                                <div id="shippingFilters">
+                                    <!-- Filters will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Category Sections -->
+                            <div id="shippingCategories" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Categories and products will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="col-md-6">
+                    <!-- Selected Products -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-shopping-cart"></i> Seçilen Ürünler</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="selectedShippingProducts" style="max-height: 200px; overflow-y: auto;">
+                                <p class="text-muted">Henüz ürün seçilmedi.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Log -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-clipboard-list"></i> Kargo Listesi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="shippingLog" style="max-height: 200px; overflow-y: auto;">
+                                <p class="text-muted">Henüz ürün eklenmedi.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Cost & Customer Info -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calculator"></i> Kargo Bilgileri</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="shipping-cost-box">
+                                <h4>Toplam Kargo Ücreti</h4>
+                                <h2 id="totalShippingCost">₺0.00</h2>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Alıcı Adı *</label>
+                                        <input type="text" class="form-control" id="recipientName" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Alıcı Soyadı *</label>
+                                        <input type="text" class="form-control" id="recipientSurname" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Adres *</label>
+                                <textarea class="form-control" id="recipientAddress" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Telefon *</label>
+                                <input type="tel" class="form-control" id="recipientPhone" required>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="createShipment()">
+                                <i class="fas fa-paper-plane"></i> Kargo Gönder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping History Page -->
+    <div id="shipping-historyPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-truck"></i> Kargo Geçmişi</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Gönderilen Kargolar</h5>
+                </div>
+                <div class="card-body">
+                    <div id="shippingHistoryList">
+                        <p class="text-muted">Henüz kargo gönderilmedi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settingsPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-cogs"></i> Ayarlar</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-truck"></i> Kargo Ücret Ayarları</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Taban Ücret (₺)</label>
+                                <input type="number" class="form-control" id="basePrice" step="0.01" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Kg Başı Ücret (₺)</label>
+                                <input type="number" class="form-control" id="pricePerKg" step="0.01" min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dm³ Başı Ücret (₺)</label>
+                                <input type="number" class="form-control" id="pricePerVolume" step="0.01" min="0">
+                            </div>
+                            <button class="btn btn-custom" onclick="saveShippingSettings()">
+                                <i class="fas fa-save"></i> Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-database"></i> Veri Yönetimi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Kategoriler</h6>
+                                <div id="categoryManagement"></div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Markalar</h6>
+                                <div id="brandManagement"></div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Etiketler</h6>
+                                <div id="tagManagement"></div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Renkler</h6>
+                                <div id="colorManagement"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logbook Page -->
+    <div id="logbookPage" class="page-content hidden">
+        <div class="container-fluid">
+            <h2 class="mb-4"><i class="fas fa-book"></i> Kayıt Defteri</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clipboard-list"></i> Sistem Kayıtları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="logDateFilter" onchange="filterLogs()">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="logUserFilter" onchange="filterLogs()">
+                                    <option value="">Tüm Kullanıcılar</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="logActionFilter" onchange="filterLogs()">
+                                    <option value="">Tüm İşlemler</option>
+                                    <option value="login">Giriş</option>
+                                    <option value="product_created">Ürün Oluşturma</option>
+                                    <option value="product_updated">Ürün Güncelleme</option>
+                                    <option value="product_deleted">Ürün Silme</option>
+                                    <option value="stock_adjusted">Stok Ayarlama</option>
+                                    <option value="shipment_created">Kargo Oluşturma</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="logbookEntries" style="max-height: 600px; overflow-y: auto;">
+                        <p class="text-muted">Henüz log kaydı yok.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Category Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Yeni Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kategori Adı</label>
+                        <input type="text" class="form-control" id="newCategoryName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-custom" onclick="addCategory()">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand Modal -->
+    <div class="modal fade" id="brandModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Yeni Marka</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Marka Adı</label>
+                        <input type="text" class="form-control" id="newBrandName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-custom" onclick="addBrand()">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tag Modal -->
+    <div class="modal fade" id="tagModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Yeni Etiket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Etiket Adı</label>
+                        <input type="text" class="form-control" id="newTagName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-custom" onclick="addTag()">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Modal -->
+    <div class="modal fade" id="colorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Yeni Renk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Renk Adı</label>
+                        <input type="text" class="form-control" id="newColorName">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Renk</label>
+                        <input type="color" class="form-control" id="newColorValue">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-custom" onclick="addColor()">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // Global Data Storage
+    let currentUser = null;
+    let users = [
+        { id: 1, username: 'admin', password: 'admin123', createdAt: new Date() }
+    ];
+    let categories = [];
+    let brands = [];
+    let tags = [];
+    let colors = [];
+    let products = [];
+    let stock = [];
+    let stockTransactions = [];
+    let shipments = [];
+    let shippingItems = [];
+    let logs = [];
+    let shippingSettings = {
+        basePrice: 15.00,
+        pricePerKg: 5.00,
+        pricePerVolume: 2.00
+    };
+
+    // Selected items for operations
+    let selectedStockProducts = {};
+    let selectedShippingProducts = {};
+    let stockAdjustments = [];
+    let shippingList = [];
+
+    // Initialize system
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSystem();
+        loadInitialData();
+    });
+
+    function initializeSystem() {
+        // Load sample data
+        loadSampleData();
+        
+        // Show login page
+        showPage('login');
+        
+        // Add event listeners
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProduct();
+        });
+        
+        // Initialize available tags multiselect
+        document.getElementById('availableTags').addEventListener('change', function() {
+            updateSelectedTags();
+        });
+    }
+
+    function loadSampleData() {
+        // Sample categories
+        categories = [
+            { id: 1, name: 'Elektronik', createdAt: new Date() },
+            { id: 2, name: 'Giyim', createdAt: new Date() },
+            { id: 3, name: 'Ev & Yaşam', createdAt: new Date() }
+        ];
+
+        // Sample brands
+        brands = [
+            { id: 1, name: 'Apple', createdAt: new Date() },
+            { id: 2, name: 'Samsung', createdAt: new Date() },
+            { id: 3, name: 'Nike', createdAt: new Date() }
+        ];
+
+        // Sample tags
+        tags = [
+            { id: 1, name: 'Su Geçirmez', createdAt: new Date() },
+            { id: 2, name: 'Kablosuz', createdAt: new Date() },
+            { id: 3, name: 'HD', createdAt: new Date() }
+        ];
+
+        // Sample colors
+        colors = [
+            { id: 1, name: 'Siyah', hexCode: '#000000', createdAt: new Date() },
+            { id: 2, name: 'Beyaz', hexCode: '#FFFFFF', createdAt: new Date() },
+            { id: 3, name: 'Kırmızı', hexCode: '#FF0000', createdAt: new Date() },
+            { id: 4, name: 'Mavi', hexCode: '#0000FF', createdAt: new Date() }
+        ];
+
+        // Sample products
+        products = [
+            {
+                id: 1,
+                name: 'iPhone 15 Pro',
+                categoryId: 1,
+                brandId: 1,
+                colorId: 1,
+                tagIds: [2, 3],
+                width: 7.09,
+                height: 14.67,
+                depth: 0.83,
+                weight: 0.187,
+                price: 35000,
+                photoUrl: null,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                id: 2,
+                name: 'Galaxy S24',
+                categoryId: 1,
+                brandId: 2,
+                colorId: 2,
+                tagIds: [1, 2],
+                width: 7.0,
+                height: 14.7,
+                depth: 0.79,
+                weight: 0.168,
+                price: 28000,
+                photoUrl: null,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        ];
+
+        // Sample stock
+        stock = [
+            { productId: 1, quantity: 25, lastUpdated: new Date() },
+            { productId: 2, quantity: 30, lastUpdated: new Date() }
+        ];
+
+        // Add log entry
+        addLog('system', 'system_initialized', 'Sistem başlatıldı ve örnek veriler yüklendi');
+    }
+
+    function loadInitialData() {
+        loadProductDropdowns();
+        loadProducts();
+        updateDashboard();
+    }
+
+    // Authentication Functions
+    function login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (!username || !password) {
+            showAlert('Kullanıcı adı ve şifre gerekli!', 'danger');
+            return;
+        }
+
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            currentUser = user;
+            document.getElementById('currentUser').textContent = user.username;
+            addLog(user.username, 'login', 'Kullanıcı sisteme giriş yaptı');
+            showAlert('Giriş başarılı!', 'success');
+            showPage('dashboard');
+            document.getElementById('mainNavbar').style.display = 'block';
+        } else {
+            showAlert('Geçersiz kullanıcı adı veya şifre!', 'danger');
+        }
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+    }
+
+    function showLoginForm() {
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+    }
+
+    function register() {
+        const adminUsername = document.getElementById('adminUsername').value;
+        const adminPassword = document.getElementById('adminPassword').value;
+        const newUsername = document.getElementById('newUsername').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // Validate admin credentials
+        const admin = users.find(u => u.username === adminUsername && u.password === adminPassword);
+        if (!admin) {
+            showAlert('Geçersiz admin bilgileri!', 'danger');
+            return;
+        }
+
+        // Validate new user data
+        if (!newUsername || !newPassword) {
+            showAlert('Yeni kullanıcı bilgileri eksik!', 'danger');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showAlert('Şifreler eşleşmiyor!', 'danger');
+            return;
+        }
+
+        // Check if username exists
+        if (users.find(u => u.username === newUsername)) {
+            showAlert('Bu kullanıcı adı zaten mevcut!', 'danger');
+            return;
+        }
+
+        // Create new user
+        const newUser = {
+            id: users.length + 1,
+            username: newUsername,
+            password: newPassword,
+            createdAt: new Date()
+        };
+
+        users.push(newUser);
+        addLog(admin.username, 'user_created', `Yeni kullanıcı oluşturuldu: ${newUsername}`);
+        showAlert('Yeni kullanıcı başarıyla oluşturuldu!', 'success');
+        
+        // Clear form and return to login
+        document.getElementById('adminUsername').value = '';
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('newUsername').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        showLoginForm();
+    }
+
+    function logout() {
+        if (currentUser) {
+            addLog(currentUser.username, 'logout', 'Kullanıcı sistemden çıkış yaptı');
+        }
+        currentUser = null;
+        document.getElementById('mainNavbar').style.display = 'none';
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+        showPage('login');
+        showAlert('Çıkış yapıldı!', 'info');
+    }
+
+    // Page Navigation
+    function showPage(pageId) {
+        // Hide all pages
+        const pages = document.querySelectorAll('.page-content, .login-container');
+        pages.forEach(page => page.classList.add('hidden'));
+
+        // Remove active class from nav links
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => link.classList.remove('active'));
+
+        // Show requested page
+        if (pageId === 'login') {
+            document.getElementById('loginPage').classList.remove('hidden');
+        } else {
+            document.getElementById(pageId + 'Page').classList.remove('hidden');
+            // Add active class to corresponding nav link
+            const activeLink = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+            if (activeLink) activeLink.classList.add('active');
+        }
+
+        // Load page-specific data
+        switch(pageId) {
+            case 'dashboard':
+                updateDashboard();
+                break;
+            case 'products':
+                loadProducts();
+                loadProductDropdowns();
+                break;
+            case 'stock':
+                loadStockProducts();
+                break;
+            case 'history':
+                loadTransactionHistory();
+                break;
+            case 'shipping':
+                loadShippingProducts();
+                break;
+            case 'shipping-history':
+                loadShippingHistory();
+                break;
+            case 'settings':
+                loadSettings();
+                break;
+            case 'logbook':
+                loadLogbook();
+                break;
+        }
+    }
+
+    // Utility Functions
+    function showAlert(message, type = 'info') {
+        // Create alert element
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(alert);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+
+    function generateId(array) {
+        return array.length > 0 ? Math.max(...array.map(item => item.id)) + 1 : 1;
+    }
+
+    function formatDate(date) {
+        return date.toLocaleString('tr-TR');
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('tr-TR', {
+            style: 'currency',
+            currency: 'TRY'
+        }).format(amount);
+    }
+
+    function addLog(username, actionType, details) {
+        const logEntry = {
+            id: generateId(logs),
+            timestamp: new Date(),
+            username: username,
+            actionType: actionType,
+            details: details
+        };
+        logs.push(logEntry);
+    }
+
+    // Dashboard Functions
+    function updateDashboard() {
+        // Calculate statistics
+        const totalProducts = products.length;
+        const totalStock = stock.reduce((sum, item) => sum + item.quantity, 0);
+        const totalShipments = shipments.length;
+        const totalRevenue = shipments.reduce((sum, shipment) => sum + shipment.totalCost, 0);
+
+        // Update stats
+        document.getElementById('totalProducts').textContent = totalProducts;
+        document.getElementById('totalStock').textContent = totalStock;
+        document.getElementById('totalShipments').textContent = totalShipments;
+        document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+
+        // Load recent transactions
+        loadRecentTransactions();
+        loadLowStockAlerts();
+    }
+
+    function loadRecentTransactions() {
+        const recent = stockTransactions.slice(-5).reverse();
+        const container = document.getElementById('recentTransactions');
+        
+        if (recent.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz işlem bulunmuyor.</p>';
+            return;
+        }
+
+        container.innerHTML = recent.map(transaction => {
+            const product = products.find(p => p.id === transaction.productId);
+            const productName = product ? product.name : 'Bilinmeyen Ürün';
+            const changeText = transaction.quantityChange > 0 ? '+' + transaction.quantityChange : transaction.quantityChange;
+            const changeClass = transaction.quantityChange > 0 ? 'text-success' : 'text-danger';
+            
+            return `
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <div>
+                        <strong>${productName}</strong><br>
+                        <small class="text-muted">${formatDate(transaction.timestamp)}</small>
+                    </div>
+                    <span class="${changeClass} fw-bold">${changeText}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function loadLowStockAlerts() {
+        const lowStock = stock.filter(item => item.quantity < 10);
+        const container = document.getElementById('lowStockAlerts');
+        
+        if (lowStock.length === 0) {
+            container.innerHTML = '<p class="text-muted">Düşük stok uyarısı yok.</p>';
+            return;
+        }
+
+        container.innerHTML = lowStock.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            const productName = product ? product.name : 'Bilinmeyen Ürün';
+            
+            return `
+                <div class="alert alert-warning py-2 mb-2">
+                    <strong>${productName}</strong><br>
+                    <small>Kalan stok: ${item.quantity}</small>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Product Management Functions
+    function loadProductDropdowns() {
+        // Load categories
+        const categorySelect = document.getElementById('productCategory');
+        categorySelect.innerHTML = '<option value="">Kategori seçin</option>' +
+            categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+
+        // Load brands
+        const brandSelect = document.getElementById('productBrand');
+        brandSelect.innerHTML = '<option value="">Marka seçin</option>' +
+            brands.map(brand => `<option value="${brand.id}">${brand.name}</option>`).join('');
+
+        // Load tags
+        const tagSelect = document.getElementById('availableTags');
+        tagSelect.innerHTML = tags.map(tag => `<option value="${tag.id}">${tag.name}</option>`).join('');
+
+        // Load colors
+        loadColorSelection();
+    }
+
+    function loadColorSelection() {
+        const container = document.getElementById('colorSelection');
+        const colorCircles = colors.map(color => 
+            `<div class="color-circle" style="background-color: ${color.hexCode}" 
+                  title="${color.name}" data-color-id="${color.id}" 
+                  onclick="selectColor(${color.id})"></div>`
+        ).join('');
+        
+        container.innerHTML = colorCircles + 
+            `<button type="button" class="btn btn-outline-secondary btn-sm ms-2" onclick="showColorModal()">
+                <i class="fas fa-plus"></i> Yeni Renk
+            </button>`;
+    }
+
+    function selectColor(colorId) {
+        // Remove previous selection
+        document.querySelectorAll('.color-circle').forEach(circle => {
+            circle.classList.remove('selected');
+        });
+        
+        // Add selection to clicked color
+        document.querySelector(`[data-color-id="${colorId}"]`).classList.add('selected');
+    }
+
+    function updateSelectedTags() {
+        const tagSelect = document.getElementById('availableTags');
+        const selectedContainer = document.getElementById('selectedTags');
+        const selectedValues = Array.from(tagSelect.selectedOptions).map(option => option.value);
+        
+        selectedContainer.innerHTML = selectedValues.map(tagId => {
+            const tag = tags.find(t => t.id == tagId);
+            return `<span class="tag-badge">${tag.name}</span>`;
+        }).join('');
+    }
+
+    function loadProducts() {
+        const container = document.getElementById('productList');
+        if (products.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz ürün eklenmedi.</p>';
+            return;
+        }
+
+        // Group products by category
+        const productsByCategory = {};
+        products.forEach(product => {
+            const categoryName = categories.find(c => c.id === product.categoryId)?.name || 'Kategori Yok';
+            if (!productsByCategory[categoryName]) {
+                productsByCategory[categoryName] = [];
+            }
+            productsByCategory[categoryName].push(product);
+        });
+
+        container.innerHTML = Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => `
+            <div class="category-section">
+                <div class="category-header">
+                    <strong>${categoryName}</strong>
+                </div>
+                ${categoryProducts.map(product => {
+                    const brand = brands.find(b => b.id === product.brandId);
+                    const color = colors.find(c => c.id === product.colorId);
+                    const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+                    
+                    return `
+                        <div class="product-card" onclick="editProduct(${product.id})">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${product.name}</h6>
+                                    <small class="text-muted">
+                                        ${brand ? brand.name : ''} | 
+                                        ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span> ${color.name}` : ''}
+                                    </small><br>
+                                    <small class="fw-bold">${formatCurrency(product.price)}</small>
+                                    ${productTags.length > 0 ? '<br>' + productTags.map(tag => `<span class="tag-badge">${tag.name}</span>`).join('') : ''}
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteProduct(${product.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `).join('');
+    }
+
+    function searchProducts() {
+        const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+        const productCards = document.querySelectorAll('.product-card');
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('h6').textContent.toLowerCase();
+            if (productName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function editProduct(productId) {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        // Fill form with product data
+        document.getElementById('editingProductId').value = product.id;
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productCategory').value = product.categoryId || '';
+        document.getElementById('productBrand').value = product.brandId || '';
+        document.getElementById('productWidth').value = product.width || '';
+        document.getElementById('productHeight').value = product.height || '';
+        document.getElementById('productDepth').value = product.depth || '';
+        document.getElementById('productWeight').value = product.weight || '';
+
+        // Select color
+        if (product.colorId) {
+            selectColor(product.colorId);
+        }
+
+        // Select tags
+        const tagSelect = document.getElementById('availableTags');
+        Array.from(tagSelect.options).forEach(option => {
+            option.selected = product.tagIds && product.tagIds.includes(parseInt(option.value));
+        });
+        updateSelectedTags();
+
+        // Update form title and show delete button
+        document.getElementById('productFormTitle').innerHTML = '<i class="fas fa-edit"></i> Ürün Düzenle';
+        document.getElementById('deleteProductBtn').style.display = 'inline-block';
+    }
+
+    function saveProduct() {
+        const productId = document.getElementById('editingProductId').value;
+        const name = document.getElementById('productName').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const categoryId = parseInt(document.getElementById('productCategory').value) || null;
+        const brandId = parseInt(document.getElementById('productBrand').value) || null;
+        const width = parseFloat(document.getElementById('productWidth').value) || null;
+        const height = parseFloat(document.getElementById('productHeight').value) || null;
+        const depth = parseFloat(document.getElementById('productDepth').value) || null;
+        const weight = parseFloat(document.getElementById('productWeight').value) || null;
+
+        // Get selected color
+        const selectedColorElement = document.querySelector('.color-circle.selected');
+        const colorId = selectedColorElement ? parseInt(selectedColorElement.dataset.colorId) : null;
+
+        // Get selected tags
+        const tagSelect = document.getElementById('availableTags');
+        const tagIds = Array.from(tagSelect.selectedOptions).map(option => parseInt(option.value));
+
+        if (!name || !price) {
+            showAlert('Ürün adı ve fiyat gerekli!', 'danger');
+            return;
+        }
+
+        const productData = {
+            name,
+            price,
+            categoryId,
+            brandId,
+            colorId,
+            tagIds,
+            width,
+            height,
+            depth,
+            weight,
+            photoUrl: null // File handling would be implemented here
+        };
+
+        if (productId) {
+            // Update existing product
+            const productIndex = products.findIndex(p => p.id === parseInt(productId));
+            if (productIndex !== -1) {
+                products[productIndex] = {
+                    ...products[productIndex],
+                    ...productData,
+                    updatedAt: new Date()
+                };
+                addLog(currentUser.username, 'product_updated', `Ürün güncellendi: ${name}`);
+                showAlert('Ürün başarıyla güncellendi!', 'success');
+            }
+        } else {
+            // Create new product
+            const newProduct = {
+                id: generateId(products),
+                ...productData,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            products.push(newProduct);
+            
+            // Initialize stock for new product
+            stock.push({
+                productId: newProduct.id,
+                quantity: 0,
+                lastUpdated: new Date()
+            });
+            
+            addLog(currentUser.username, 'product_created', `Yeni ürün oluşturuldu: ${name}`);
+            showAlert('Ürün başarıyla eklendi!', 'success');
+        }
+
+        resetProductForm();
+        loadProducts();
+        updateDashboard();
+    }
+
+    function deleteProduct(productId) {
+        if (!productId) {
+            productId = parseInt(document.getElementById('editingProductId').value);
+        }
+        
+        if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        // Remove product
+        products = products.filter(p => p.id !== productId);
+        
+        // Remove stock entry
+        stock = stock.filter(s => s.productId !== productId);
+        
+        // Remove stock transactions
+        stockTransactions = stockTransactions.filter(st => st.productId !== productId);
+
+        addLog(currentUser.username, 'product_deleted', `Ürün silindi: ${product.name}`);
+        showAlert('Ürün başarıyla silindi!', 'success');
+        
+        resetProductForm();
+        loadProducts();
+        updateDashboard();
+    }
+
+    function resetProductForm() {
+        document.getElementById('productForm').reset();
+        document.getElementById('editingProductId').value = '';
+        document.getElementById('productFormTitle').innerHTML = '<i class="fas fa-plus"></i> Yeni Ürün Ekle';
+        document.getElementById('deleteProductBtn').style.display = 'none';
+        document.getElementById('selectedTags').innerHTML = '';
+        
+        // Clear color selection
+        document.querySelectorAll('.color-circle').forEach(circle => {
+            circle.classList.remove('selected');
+        });
+    }
+
+    // Modal Functions
+    function showCategoryModal() {
+        document.getElementById('newCategoryName').value = '';
+        new bootstrap.Modal(document.getElementById('categoryModal')).show();
+    }
+
+    function addCategory() {
+        const categoryName = document.getElementById('newCategoryName').value.trim();
+        if (!categoryName) {
+            showAlert('Kategori adı gerekli!', 'danger');
+            return;
+        }
+
+        if (categories.find(c => c.name.toLowerCase() === categoryName.toLowerCase())) {
+            showAlert('Bu kategori zaten mevcut!', 'danger');
+            return;
+        }
+
+        const newCategory = {
+            id: generateId(categories),
+            name: categoryName,
+            createdAt: new Date()
+        };
+
+        categories.push(newCategory);
+        addLog(currentUser.username, 'category_created', `Yeni kategori oluşturuldu: ${categoryName}`);
+        
+        // Update dropdown
+        loadProductDropdowns();
+        
+        // Select the new category
+        document.getElementById('productCategory').value = newCategory.id;
+        
+        bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
+        showAlert('Kategori başarıyla eklendi!', 'success');
+    }
+
+    function showBrandModal() {
+        document.getElementById('newBrandName').value = '';
+        new bootstrap.Modal(document.getElementById('brandModal')).show();
+    }
+
+    function addBrand() {
+        const brandName = document.getElementById('newBrandName').value.trim();
+        if (!brandName) {
+            showAlert('Marka adı gerekli!', 'danger');
+            return;
+        }
+
+        if (brands.find(b => b.name.toLowerCase() === brandName.toLowerCase())) {
+            showAlert('Bu marka zaten mevcut!', 'danger');
+            return;
+        }
+
+        const newBrand = {
+            id: generateId(brands),
+            name: brandName,
+            createdAt: new Date()
+        };
+
+        brands.push(newBrand);
+        addLog(currentUser.username, 'brand_created', `Yeni marka oluşturuldu: ${brandName}`);
+        
+        // Update dropdown
+        loadProductDropdowns();
+        
+        // Select the new brand
+        document.getElementById('productBrand').value = newBrand.id;
+        
+        bootstrap.Modal.getInstance(document.getElementById('brandModal')).hide();
+        showAlert('Marka başarıyla eklendi!', 'success');
+    }
+
+    function showTagModal() {
+        document.getElementById('newTagName').value = '';
+        new bootstrap.Modal(document.getElementById('tagModal')).show();
+    }
+
+    function addTag() {
+        const tagName = document.getElementById('newTagName').value.trim();
+        if (!tagName) {
+            showAlert('Etiket adı gerekli!', 'danger');
+            return;
+        }
+
+        if (tags.find(t => t.name.toLowerCase() === tagName.toLowerCase())) {
+            showAlert('Bu etiket zaten mevcut!', 'danger');
+            return;
+        }
+
+        const newTag = {
+            id: generateId(tags),
+            name: tagName,
+            createdAt: new Date()
+        };
+
+        tags.push(newTag);
+        addLog(currentUser.username, 'tag_created', `Yeni etiket oluşturuldu: ${tagName}`);
+        
+        // Update dropdown
+        loadProductDropdowns();
+        
+        bootstrap.Modal.getInstance(document.getElementById('tagModal')).hide();
+        showAlert('Etiket başarıyla eklendi!', 'success');
+    }
+
+    function showColorModal() {
+        document.getElementById('newColorName').value = '';
+        document.getElementById('newColorValue').value = '#000000';
+        new bootstrap.Modal(document.getElementById('colorModal')).show();
+    }
+
+    function addColor() {
+        const colorName = document.getElementById('newColorName').value.trim();
+        const colorValue = document.getElementById('newColorValue').value;
+        
+        if (!colorName) {
+            showAlert('Renk adı gerekli!', 'danger');
+            return;
+        }
+
+        if (colors.find(c => c.name.toLowerCase() === colorName.toLowerCase())) {
+            showAlert('Bu renk zaten mevcut!', 'danger');
+            return;
+        }
+
+        const newColor = {
+            id: generateId(colors),
+            name: colorName,
+            hexCode: colorValue,
+            createdAt: new Date()
+        };
+
+        colors.push(newColor);
+        addLog(currentUser.username, 'color_created', `Yeni renk oluşturuldu: ${colorName}`);
+        
+        // Update color selection
+        loadColorSelection();
+        
+        bootstrap.Modal.getInstance(document.getElementById('colorModal')).hide();
+        showAlert('Renk başarıyla eklendi!', 'success');
+    }
+
+    // Stock Management Functions
+    function loadStockProducts() {
+        loadStockFilters();
+        loadStockCategories();
+        updateSelectedStockProducts();
+        updateStockAdjustmentLog();
+    }
+
+    function loadStockFilters() {
+        const container = document.getElementById('stockFilters');
+        
+        // Create tag filters
+        const tagFilters = tags.map(tag => `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="tagFilter${tag.id}" value="${tag.id}" onchange="filterStockProducts()">
+                <label class="form-check-label" for="tagFilter${tag.id}">
+                    ${tag.name}
+                </label>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="mb-3">
+                <h6>Etiketler</h6>
+                ${tagFilters}
+            </div>
+        `;
+    }
+
+    function loadStockCategories() {
+        const container = document.getElementById('stockCategories');
+        
+        // Group products by category
+        const productsByCategory = {};
+        products.forEach(product => {
+            const categoryName = categories.find(c => c.id === product.categoryId)?.name || 'Kategori Yok';
+            if (!productsByCategory[categoryName]) {
+                productsByCategory[categoryName] = [];
+            }
+            productsByCategory[categoryName].push(product);
+        });
+
+        container.innerHTML = Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => `
+            <div class="category-section">
+                <div class="category-header" onclick="toggleCategory('stock${categoryName.replace(/\s+/g, '')}')">
+                    <i class="fas fa-chevron-down"></i> <strong>${categoryName}</strong>
+                </div>
+                <div id="stock${categoryName.replace(/\s+/g, '')}" class="category-products" style="display: block;">
+                    ${categoryProducts.map(product => {
+                        const stockItem = stock.find(s => s.productId === product.id);
+                        const currentStock = stockItem ? stockItem.quantity : 0;
+                        const brand = brands.find(b => b.id === product.brandId);
+                        const color = colors.find(c => c.id === product.colorId);
+                        const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+                        
+                        return `
+                            <div class="product-card" data-product-id="${product.id}" data-tags="${product.tagIds ? product.tagIds.join(',') : ''}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="stockProduct${product.id}" 
+                                           value="${product.id}" onchange="toggleStockProduct(${product.id})">
+                                    <label class="form-check-label" for="stockProduct${product.id}">
+                                        <strong>${product.name}</strong><br>
+                                        <small class="text-muted">
+                                            ${brand ? brand.name : ''} | 
+                                            ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span> ${color.name}` : ''}
+                                        </small><br>
+                                        <small class="fw-bold">Stok: ${currentStock}</small>
+                                        ${productTags.length > 0 ? '<br>' + productTags.map(tag => `<span class="tag-badge">${tag.name}</span>`).join('') : ''}
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function toggleCategory(categoryId) {
+        const categoryDiv = document.getElementById(categoryId);
+        const icon = categoryDiv.previousElementSibling.querySelector('.fas');
+        
+        if (categoryDiv.style.display === 'none') {
+            categoryDiv.style.display = 'block';
+            icon.classList.remove('fa-chevron-right');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            categoryDiv.style.display = 'none';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-right');
+        }
+    }
+
+    function searchStockProducts() {
+        const searchTerm = document.getElementById('stockProductSearch').value.toLowerCase();
+        const productCards = document.querySelectorAll('#stockCategories .product-card');
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('strong').textContent.toLowerCase();
+            if (productName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterStockProducts() {
+        const selectedTags = Array.from(document.querySelectorAll('#stockFilters input[type="checkbox"]:checked'))
+                                 .map(cb => cb.value);
+        const productCards = document.querySelectorAll('#stockCategories .product-card');
+        
+        productCards.forEach(card => {
+            const productTags = card.dataset.tags.split(',').filter(tag => tag);
+            
+            if (selectedTags.length === 0) {
+                card.style.display = 'block';
+            } else {
+                const hasMatchingTag = selectedTags.some(tag => productTags.includes(tag));
+                card.style.display = hasMatchingTag ? 'block' : 'none';
+            }
+        });
+    }
+
+    function toggleStockProduct(productId) {
+        const checkbox = document.getElementById(`stockProduct${productId}`);
+        
+        if (checkbox.checked) {
+            if (!selectedStockProducts[productId]) {
+                selectedStockProducts[productId] = {
+                    product: products.find(p => p.id === productId),
+                    adjustment: 0
+                };
+            }
+        } else {
+            delete selectedStockProducts[productId];
+        }
+        
+        updateSelectedStockProducts();
+    }
+
+    function updateSelectedStockProducts() {
+        const container = document.getElementById('selectedStockProducts');
+        const selectedProducts = Object.values(selectedStockProducts);
+        
+        if (selectedProducts.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz ürün seçilmedi.</p>';
+            return;
+        }
+
+        container.innerHTML = selectedProducts.map(item => {
+            const product = item.product;
+            const stockItem = stock.find(s => s.productId === product.id);
+            const currentStock = stockItem ? stockItem.quantity : 0;
+            const newStock = currentStock + item.adjustment;
+            const color = colors.find(c => c.id === product.colorId);
+            const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+            
+            return `
+                <div class="card mb-2">
+                    <div class="card-body p-3">
+                        <h6 class="mb-1">${product.name}</h6>
+                        <small class="text-muted">
+                            ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span> ${color.name}` : ''}
+                            ${productTags.length > 0 ? ' | ' + productTags.map(tag => tag.name).join(', ') : ''}
+                        </small>
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="adjustStockQuantity(${product.id}, -1)">-</button>
+                            <input type="number" class="quantity-input" value="${item.adjustment}" 
+                                   onchange="setStockAdjustment(${product.id}, this.value)">
+                            <button class="quantity-btn" onclick="adjustStockQuantity(${product.id}, 1)">+</button>
+                        </div>
+                        <small class="text-muted">
+                            Mevcut: ${currentStock} → Yeni: <span class="${newStock >= 0 ? 'text-success' : 'text-danger'}">${newStock}</span>
+                        </small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function adjustStockQuantity(productId, change) {
+        if (selectedStockProducts[productId]) {
+            selectedStockProducts[productId].adjustment += change;
+            updateSelectedStockProducts();
+            addToStockAdjustmentLog(productId, change);
+        }
+    }
+
+    function setStockAdjustment(productId, value) {
+        if (selectedStockProducts[productId]) {
+            const newValue = parseInt(value) || 0;
+            const oldValue = selectedStockProducts[productId].adjustment;
+            selectedStockProducts[productId].adjustment = newValue;
+            updateSelectedStockProducts();
+            
+            if (newValue !== oldValue) {
+                addToStockAdjustmentLog(productId, newValue - oldValue);
+            }
+        }
+    }
+
+    function addToStockAdjustmentLog(productId, change) {
+        const product = products.find(p => p.id === productId);
+        const color = colors.find(c => c.id === product.colorId);
+        const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+        
+        stockAdjustments.push({
+            id: Date.now(),
+            productId: productId,
+            productName: product.name,
+            color: color,
+            tags: productTags,
+            change: change,
+            timestamp: new Date()
+        });
+        
+        updateStockAdjustmentLog();
+    }
+
+    function updateStockAdjustmentLog() {
+        const container = document.getElementById('stockAdjustmentLog');
+        
+        if (stockAdjustments.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz işlem yapılmadı.</p>';
+            return;
+        }
+
+        container.innerHTML = stockAdjustments.slice(-10).reverse().map(adjustment => {
+            const changeClass = adjustment.change > 0 ? 'positive' : 'negative';
+            const changeText = adjustment.change > 0 ? '+' + adjustment.change : adjustment.change;
+            
+            return `
+                <div class="log-entry ${changeClass}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${adjustment.productName}</strong>
+                            ${adjustment.color ? `<span class="color-circle" style="background-color: ${adjustment.color.hexCode}; width: 15px; height: 15px;"></span>` : ''}
+                            <span class="fw-bold">${changeText}</span>
+                            ${adjustment.tags.length > 0 ? '<br>' + adjustment.tags.map(tag => `<span class="tag-badge">${tag.name}</span>`).join('') : ''}
+                        </div>
+                        <small class="text-muted">${formatDate(adjustment.timestamp)}</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function saveStockAdjustments() {
+        if (Object.keys(selectedStockProducts).length === 0) {
+            showAlert('Henüz ürün seçilmedi!', 'warning');
+            return;
+        }
+
+        let hasChanges = false;
+        Object.values(selectedStockProducts).forEach(item => {
+            if (item.adjustment !== 0) {
+                hasChanges = true;
+                
+                // Update stock
+                const stockItem = stock.find(s => s.productId === item.product.id);
+                if (stockItem) {
+                    stockItem.quantity += item.adjustment;
+                    stockItem.lastUpdated = new Date();
+                } else {
+                    stock.push({
+                        productId: item.product.id,
+                        quantity: item.adjustment,
+                        lastUpdated: new Date()
+                    });
+                }
+
+                // Add transaction record
+                const transaction = {
+                    id: generateId(stockTransactions),
+                    productId: item.product.id,
+                    quantityChange: item.adjustment,
+                    timestamp: new Date(),
+                    userId: currentUser.id,
+                    note: 'Stok ayarlama'
+                };
+                stockTransactions.push(transaction);
+                
+                addLog(currentUser.username, 'stock_adjusted', 
+                       `${item.product.name} - ${item.adjustment > 0 ? '+' : ''}${item.adjustment}`);
+            }
+        });
+
+        if (hasChanges) {
+            showAlert('Stok değişiklikleri başarıyla kaydedildi!', 'success');
+            
+            // Reset selections
+            selectedStockProducts = {};
+            stockAdjustments = [];
+            
+            // Uncheck all checkboxes
+            document.querySelectorAll('#stockCategories input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            updateSelectedStockProducts();
+            updateStockAdjustmentLog();
+            loadStockCategories(); // Refresh to show updated stock numbers
+            updateDashboard();
+        } else {
+            showAlert('Henüz değişiklik yapılmadı!', 'warning');
+        }
+    }
+
+    // Transaction History Functions
+    function loadTransactionHistory() {
+        loadOutgoingTransactions();
+        loadIncomingTransactions();
+    }
+
+    function loadOutgoingTransactions() {
+        const container = document.getElementById('outgoingTransactions');
+        const outgoingTransactions = stockTransactions.filter(t => t.quantityChange < 0);
+        
+        if (outgoingTransactions.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz giden ürün kaydı yok.</p>';
+            return;
+        }
+
+        container.innerHTML = outgoingTransactions.reverse().map(transaction => {
+            const product = products.find(p => p.id === transaction.productId);
+            const productName = product ? product.name : 'Bilinmeyen Ürün';
+            
+            return `
+                <div class="card mb-2">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">${productName}</h6>
+                                <small class="text-muted">${formatDate(transaction.timestamp)}</small><br>
+                                <span class="badge bg-danger">-${Math.abs(transaction.quantityChange)} adet</span>
+                                ${transaction.note ? `<br><small class="text-muted">${transaction.note}</small>` : ''}
+                            </div>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteTransaction(${transaction.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function loadIncomingTransactions() {
+        const container = document.getElementById('incomingTransactions');
+        const incomingTransactions = stockTransactions.filter(t => t.quantityChange > 0);
+        
+        if (incomingTransactions.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz gelen ürün kaydı yok.</p>';
+            return;
+        }
+
+        container.innerHTML = incomingTransactions.reverse().map(transaction => {
+            const product = products.find(p => p.id === transaction.productId);
+            const productName = product ? product.name : 'Bilinmeyen Ürün';
+            
+            return `
+                <div class="card mb-2">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">${productName}</h6>
+                                <small class="text-muted">${formatDate(transaction.timestamp)}</small><br>
+                                <span class="badge bg-success">+${transaction.quantityChange} adet</span>
+                                ${transaction.note ? `<br><small class="text-muted">${transaction.note}</small>` : ''}
+                            </div>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteTransaction(${transaction.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function deleteTransaction(transactionId) {
+        if (!confirm('Bu işlemi silmek istediğinizden emin misiniz? Stok miktarı eski haline döndürülecektir.')) {
+            return;
+        }
+
+        const transaction = stockTransactions.find(t => t.id === transactionId);
+        if (!transaction) return;
+
+        // Reverse the stock change
+        const stockItem = stock.find(s => s.productId === transaction.productId);
+        if (stockItem) {
+            stockItem.quantity -= transaction.quantityChange;
+            stockItem.lastUpdated = new Date();
+        }
+
+        // Remove transaction
+        stockTransactions = stockTransactions.filter(t => t.id !== transactionId);
+
+        const product = products.find(p => p.id === transaction.productId);
+        addLog(currentUser.username, 'transaction_deleted', 
+               `İşlem geri alındı: ${product ? product.name : 'Bilinmeyen Ürün'} - ${transaction.quantityChange}`);
+
+        showAlert('İşlem başarıyla silindi ve stok güncellendi!', 'success');
+        loadTransactionHistory();
+        updateDashboard();
+    }
+
+    // Shipping Functions
+    function loadShippingProducts() {
+        loadShippingFilters();
+        loadShippingCategories();
+        updateSelectedShippingProducts();
+        updateShippingLog();
+        updateShippingCost();
+    }
+
+    function loadShippingFilters() {
+        const container = document.getElementById('shippingFilters');
+        
+        const tagFilters = tags.map(tag => `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="shippingTagFilter${tag.id}" value="${tag.id}" onchange="filterShippingProducts()">
+                <label class="form-check-label" for="shippingTagFilter${tag.id}">
+                    ${tag.name}
+                </label>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="mb-3">
+                <h6>Etiketler</h6>
+                ${tagFilters}
+            </div>
+        `;
+    }
+
+    function loadShippingCategories() {
+        const container = document.getElementById('shippingCategories');
+        
+        // Group products by category
+        const productsByCategory = {};
+        products.forEach(product => {
+            const categoryName = categories.find(c => c.id === product.categoryId)?.name || 'Kategori Yok';
+            if (!productsByCategory[categoryName]) {
+                productsByCategory[categoryName] = [];
+            }
+            productsByCategory[categoryName].push(product);
+        });
+
+        container.innerHTML = Object.entries(productsByCategory).map(([categoryName, categoryProducts]) => `
+            <div class="category-section">
+                <div class="category-header" onclick="toggleCategory('shipping${categoryName.replace(/\s+/g, '')}')">
+                    <i class="fas fa-chevron-down"></i> <strong>${categoryName}</strong>
+                </div>
+                <div id="shipping${categoryName.replace(/\s+/g, '')}" class="category-products" style="display: block;">
+                    ${categoryProducts.map(product => {
+                        const stockItem = stock.find(s => s.productId === product.id);
+                        const currentStock = stockItem ? stockItem.quantity : 0;
+                        const brand = brands.find(b => b.id === product.brandId);
+                        const color = colors.find(c => c.id === product.colorId);
+                        const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+                        
+                        return `
+                            <div class="product-card" data-product-id="${product.id}" data-tags="${product.tagIds ? product.tagIds.join(',') : ''}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="shippingProduct${product.id}" 
+                                           value="${product.id}" onchange="toggleShippingProduct(${product.id})"
+                                           ${currentStock <= 0 ? 'disabled' : ''}>
+                                    <label class="form-check-label" for="shippingProduct${product.id}">
+                                        <strong>${product.name}</strong><br>
+                                        <small class="text-muted">
+                                            ${brand ? brand.name : ''} | 
+                                            ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span> ${color.name}` : ''}
+                                        </small><br>
+                                        <small class="fw-bold ${currentStock <= 0 ? 'text-danger' : ''}">Stok: ${currentStock}</small>
+                                        ${productTags.length > 0 ? '<br>' + productTags.map(tag => `<span class="tag-badge">${tag.name}</span>`).join('') : ''}
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function searchShippingProducts() {
+        const searchTerm = document.getElementById('shippingProductSearch').value.toLowerCase();
+        const productCards = document.querySelectorAll('#shippingCategories .product-card');
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('strong').textContent.toLowerCase();
+            if (productName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterShippingProducts() {
+        const selectedTags = Array.from(document.querySelectorAll('#shippingFilters input[type="checkbox"]:checked'))
+                                 .map(cb => cb.value);
+        const productCards = document.querySelectorAll('#shippingCategories .product-card');
+        
+        productCards.forEach(card => {
+            const productTags = card.dataset.tags.split(',').filter(tag => tag);
+            
+            if (selectedTags.length === 0) {
+                card.style.display = 'block';
+            } else {
+                const hasMatchingTag = selectedTags.some(tag => productTags.includes(tag));
+                card.style.display = hasMatchingTag ? 'block' : 'none';
+            }
+        });
+    }
+
+    function toggleShippingProduct(productId) {
+        const checkbox = document.getElementById(`shippingProduct${productId}`);
+        
+        if (checkbox.checked) {
+            if (!selectedShippingProducts[productId]) {
+                selectedShippingProducts[productId] = {
+                    product: products.find(p => p.id === productId),
+                    quantity: 1
+                };
+            }
+        } else {
+            delete selectedShippingProducts[productId];
+        }
+        
+        updateSelectedShippingProducts();
+        updateShippingCost();
+    }
+
+    function updateSelectedShippingProducts() {
+        const container = document.getElementById('selectedShippingProducts');
+        const selectedProducts = Object.values(selectedShippingProducts);
+        
+        if (selectedProducts.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz ürün seçilmedi.</p>';
+            return;
+        }
+
+        container.innerHTML = selectedProducts.map(item => {
+            const product = item.product;
+            const stockItem = stock.find(s => s.productId === product.id);
+            const currentStock = stockItem ? stockItem.quantity : 0;
+            const color = colors.find(c => c.id === product.colorId);
+            const productTags = tags.filter(t => product.tagIds && product.tagIds.includes(t.id));
+            
+            return `
+                <div class="card mb-2">
+                    <div class="card-body p-3">
+                        <h6 class="mb-1">${product.name}</h6>
+                        <small class="text-muted">
+                            ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span> ${color.name}` : ''}
+                            ${productTags.length > 0 ? ' | ' + productTags.map(tag => tag.name).join(', ') : ''}
+                        </small>
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="adjustShippingQuantity(${product.id}, -1)">-</button>
+                            <input type="number" class="quantity-input" value="${item.quantity}" min="1" max="${currentStock}"
+                                   onchange="setShippingQuantity(${product.id}, this.value)">
+                            <button class="quantity-btn" onclick="adjustShippingQuantity(${product.id}, 1)">+</button>
+                        </div>
+                        <small class="text-muted">Mevcut stok: ${currentStock}</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function adjustShippingQuantity(productId, change) {
+        if (selectedShippingProducts[productId]) {
+            const stockItem = stock.find(s => s.productId === productId);
+            const currentStock = stockItem ? stockItem.quantity : 0;
+            const newQuantity = selectedShippingProducts[productId].quantity + change;
+            
+            if (newQuantity >= 1 && newQuantity <= currentStock) {
+                selectedShippingProducts[productId].quantity = newQuantity;
+                updateSelectedShippingProducts();
+                updateShippingCost();
+            }
+        }
+    }
+
+    function setShippingQuantity(productId, value) {
+        if (selectedShippingProducts[productId]) {
+            const stockItem = stock.find(s => s.productId === productId);
+            const currentStock = stockItem ? stockItem.quantity : 0;
+            const newQuantity = parseInt(value) || 1;
+            
+            if (newQuantity >= 1 && newQuantity <= currentStock) {
+                selectedShippingProducts[productId].quantity = newQuantity;
+                updateSelectedShippingProducts();
+                updateShippingCost();
+            }
+        }
+    }
+
+    function updateShippingLog() {
+        const container = document.getElementById('shippingLog');
+        
+        if (shippingList.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz ürün eklenmedi.</p>';
+            return;
+        }
+
+        container.innerHTML = shippingList.map(item => {
+            const color = colors.find(c => c.id === item.product.colorId);
+            const productTags = tags.filter(t => item.product.tagIds && item.product.tagIds.includes(t.id));
+            
+            return `
+                <div class="log-entry">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.product.name}</strong>
+                            ${color ? `<span class="color-circle" style="background-color: ${color.hexCode}; width: 15px; height: 15px;"></span>` : ''}
+                            <span class="fw-bold">x${item.quantity}</span>
+                            ${productTags.length > 0 ? '<br>' + productTags.map(tag => `<span class="tag-badge">${tag.name}</span>`).join('') : ''}
+                        </div>
+                        <small class="text-muted">${formatCurrency(calculateProductShippingCost(item.product, item.quantity))}</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function calculateProductShippingCost(product, quantity) {
+        if (!product.width || !product.height || !product.depth || !product.weight) {
+            return shippingSettings.basePrice * quantity;
+        }
+
+        const volume = (product.width * product.height * product.depth) / 1000; // dm³
+        const weightCost = product.weight * shippingSettings.pricePerKg;
+        const volumeCost = volume * shippingSettings.pricePerVolume;
+        
+        const unitCost = Math.max(shippingSettings.basePrice, weightCost, volumeCost);
+        return unitCost * quantity;
+    }
+
+    function updateShippingCost() {
+        let totalCost = 0;
+        Object.values(selectedShippingProducts).forEach(item => {
+            totalCost += calculateProductShippingCost(item.product, item.quantity);
+        });
+        
+        document.getElementById('totalShippingCost').textContent = formatCurrency(totalCost);
+    }
+
+    function createShipment() {
+        const recipientName = document.getElementById('recipientName').value.trim();
+        const recipientSurname = document.getElementById('recipientSurname').value.trim();
+        const recipientAddress = document.getElementById('recipientAddress').value.trim();
+        const recipientPhone = document.getElementById('recipientPhone').value.trim();
+
+        if (!recipientName || !recipientSurname || !recipientAddress || !recipientPhone) {
+            showAlert('Alıcı bilgileri eksik!', 'danger');
+            return;
+        }
+
+        if (Object.keys(selectedShippingProducts).length === 0) {
+            showAlert('Henüz ürün seçilmedi!', 'warning');
+            return;
+        }
+
+        // Calculate total cost
+        let totalCost = 0;
+        Object.values(selectedShippingProducts).forEach(item => {
+            totalCost += calculateProductShippingCost(item.product, item.quantity);
+        });
+
+        // Create shipment
+        const shipment = {
+            id: generateId(shipments),
+            recipientName: recipientName,
+            recipientSurname: recipientSurname,
+            address: recipientAddress,
+            phone: recipientPhone,
+            totalCost: totalCost,
+            createdAt: new Date(),
+            userId: currentUser.id
+        };
+
+        shipments.push(shipment);
+
+        // Create shipping items and update stock
+        Object.values(selectedShippingProducts).forEach(item => {
+            // Add shipping item
+            const shippingItem = {
+                id: generateId(shippingItems),
+                shippingId: shipment.id,
+                productId: item.product.id,
+                quantity: item.quantity
+            };
+            shippingItems.push(shippingItem);
+
+            // Update stock
+            const stockItem = stock.find(s => s.productId === item.product.id);
+            if (stockItem) {
+                stockItem.quantity -= item.quantity;
+                stockItem.lastUpdated = new Date();
+            }
+
+            // Add stock transaction
+            const transaction = {
+                id: generateId(stockTransactions),
+                productId: item.product.id,
+                quantityChange: -item.quantity,
+                timestamp: new Date(),
+                userId: currentUser.id,
+                note: `Kargo gönderimi - ${recipientName} ${recipientSurname}`
+            };
+            stockTransactions.push(transaction);
+
+            addLog(currentUser.username, 'shipment_created', 
+                   `Kargo oluşturuldu: ${item.product.name} x${item.quantity} - ${recipientName} ${recipientSurname}`);
+        });
+
+        showAlert('Kargo başarıyla oluşturuldu!', 'success');
+
+        // Reset form
+        document.getElementById('recipientName').value = '';
+        document.getElementById('recipientSurname').value = '';
+        document.getElementById('recipientAddress').value = '';
+        document.getElementById('recipientPhone').value = '';
+
+        // Reset selections
+        selectedShippingProducts = {};
+        shippingList = [];
+
+        // Uncheck all checkboxes
+        document.querySelectorAll('#shippingCategories input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        updateSelectedShippingProducts();
+        updateShippingLog();
+        updateShippingCost();
+        loadShippingCategories(); // Refresh to show updated stock
+        updateDashboard();
+    }
+
+    // Shipping History Functions
+    function loadShippingHistory() {
+        const container = document.getElementById('shippingHistoryList');
+        
+        if (shipments.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz kargo gönderilmedi.</p>';
+            return;
+        }
+
+        container.innerHTML = shipments.reverse().map(shipment => {
+            const items = shippingItems.filter(item => item.shippingId === shipment.id);
+            const itemsText = items.map(item => {
+                const product = products.find(p => p.id === item.productId);
+                return `${item.quantity}x ${product ? product.name : 'Bilinmeyen Ürün'}`;
+            }).join(', ');
+
+            return `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-user"></i> ${shipment.recipientName} ${shipment.recipientSurname}
+                                </h6>
+                                <p class="mb-1">
+                                    <i class="fas fa-map-marker-alt"></i> ${shipment.address}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-phone"></i> ${shipment.phone}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="fas fa-box"></i> ${itemsText}
+                                </p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> ${formatDate(shipment.createdAt)}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <h5 class="text-success mb-2">${formatCurrency(shipment.totalCost)}</h5>
+                                <button class="btn btn-danger btn-sm" onclick="deleteShipment(${shipment.id})">
+                                    <i class="fas fa-trash"></i> Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function deleteShipment(shipmentId) {
+        if (!confirm('Bu kargoyu silmek istediğinizden emin misiniz? Ürünler stoka geri eklenecektir.')) {
+            return;
+        }
+
+        const shipment = shipments.find(s => s.id === shipmentId);
+        if (!shipment) return;
+
+        // Get shipping items
+        const items = shippingItems.filter(item => item.shippingId === shipmentId);
+
+        // Return products to stock
+        items.forEach(item => {
+            const stockItem = stock.find(s => s.productId === item.productId);
+            if (stockItem) {
+                stockItem.quantity += item.quantity;
+                stockItem.lastUpdated = new Date();
+            }
+
+            // Add reverse stock transaction
+            const transaction = {
+                id: generateId(stockTransactions),
+                productId: item.productId,
+                quantityChange: item.quantity,
+                timestamp: new Date(),
+                userId: currentUser.id,
+                note: `Kargo iptali - ${shipment.recipientName} ${shipment.recipientSurname}`
+            };
+            stockTransactions.push(transaction);
+
+            const product = products.find(p => p.id === item.productId);
+            addLog(currentUser.username, 'shipment_deleted', 
+                   `Kargo silindi: ${product ? product.name : 'Bilinmeyen Ürün'} x${item.quantity} - ${shipment.recipientName} ${shipment.recipientSurname}`);
+        });
+
+        // Remove shipping items
+        shippingItems = shippingItems.filter(item => item.shippingId !== shipmentId);
+
+        // Remove shipment
+        shipments = shipments.filter(s => s.id !== shipmentId);
+
+        showAlert('Kargo başarıyla silindi ve ürünler stoka geri eklendi!', 'success');
+        loadShippingHistory();
+        updateDashboard();
+    }
+
+    // Settings Functions
+    function loadSettings() {
+        // Load shipping settings
+        document.getElementById('basePrice').value = shippingSettings.basePrice;
+        document.getElementById('pricePerKg').value = shippingSettings.pricePerKg;
+        document.getElementById('pricePerVolume').value = shippingSettings.pricePerVolume;
+
+        // Load data management
+        loadDataManagement();
+    }
+
+    function saveShippingSettings() {
+        const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
+        const pricePerKg = parseFloat(document.getElementById('pricePerKg').value) || 0;
+        const pricePerVolume = parseFloat(document.getElementById('pricePerVolume').value) || 0;
+
+        shippingSettings = {
+            basePrice: basePrice,
+            pricePerKg: pricePerKg,
+            pricePerVolume: pricePerVolume
+        };
+
+        addLog(currentUser.username, 'settings_updated', 'Kargo ücret ayarları güncellendi');
+        showAlert('Kargo ücret ayarları başarıyla kaydedildi!', 'success');
+    }
+
+    function loadDataManagement() {
+        // Categories
+        document.getElementById('categoryManagement').innerHTML = categories.map(category => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>${category.name}</span>
+                <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+
+        // Brands
+        document.getElementById('brandManagement').innerHTML = brands.map(brand => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>${brand.name}</span>
+                <button class="btn btn-danger btn-sm" onclick="deleteBrand(${brand.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+
+        // Tags
+        document.getElementById('tagManagement').innerHTML = tags.map(tag => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>${tag.name}</span>
+                <button class="btn btn-danger btn-sm" onclick="deleteTag(${tag.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+
+        // Colors
+        document.getElementById('colorManagement').innerHTML = colors.map(color => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>
+                    <span class="color-circle" style="background-color: ${color.hexCode}; width: 20px; height: 20px;"></span>
+                    ${color.name}
+                </span>
+                <button class="btn btn-danger btn-sm" onclick="deleteColor(${color.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function deleteCategory(categoryId) {
+        if (products.some(p => p.categoryId === categoryId)) {
+            showAlert('Bu kategoriye ait ürünler var, silinemez!', 'danger');
+            return;
+        }
+
+        if (confirm('Bu kategoriyi silmek istediğinizden emin misiniz?')) {
+            const category = categories.find(c => c.id === categoryId);
+            categories = categories.filter(c => c.id !== categoryId);
+            addLog(currentUser.username, 'category_deleted', `Kategori silindi: ${category.name}`);
+            showAlert('Kategori başarıyla silindi!', 'success');
+            loadDataManagement();
+            loadProductDropdowns();
+        }
+    }
+
+    function deleteBrand(brandId) {
+        if (products.some(p => p.brandId === brandId)) {
+            showAlert('Bu markaya ait ürünler var, silinemez!', 'danger');
+            return;
+        }
+
+        if (confirm('Bu markayı silmek istediğinizden emin misiniz?')) {
+            const brand = brands.find(b => b.id === brandId);
+            brands = brands.filter(b => b.id !== brandId);
+            addLog(currentUser.username, 'brand_deleted', `Marka silindi: ${brand.name}`);
+            showAlert('Marka başarıyla silindi!', 'success');
+            loadDataManagement();
+            loadProductDropdowns();
+        }
+    }
+
+    function deleteTag(tagId) {
+        if (products.some(p => p.tagIds && p.tagIds.includes(tagId))) {
+            showAlert('Bu etikete ait ürünler var, silinemez!', 'danger');
+            return;
+        }
+
+        if (confirm('Bu etiketi silmek istediğinizden emin misiniz?')) {
+            const tag = tags.find(t => t.id === tagId);
+            tags = tags.filter(t => t.id !== tagId);
+            addLog(currentUser.username, 'tag_deleted', `Etiket silindi: ${tag.name}`);
+            showAlert('Etiket başarıyla silindi!', 'success');
+            loadDataManagement();
+            loadProductDropdowns();
+        }
+    }
+
+    function deleteColor(colorId) {
+        if (products.some(p => p.colorId === colorId)) {
+            showAlert('Bu renge ait ürünler var, silinemez!', 'danger');
+            return;
+        }
+
+        if (confirm('Bu rengi silmek istediğinizden emin misiniz?')) {
+            const color = colors.find(c => c.id === colorId);
+            colors = colors.filter(c => c.id !== colorId);
+            addLog(currentUser.username, 'color_deleted', `Renk silindi: ${color.name}`);
+            showAlert('Renk başarıyla silindi!', 'success');
+            loadDataManagement();
+            loadColorSelection();
+        }
+    }
+
+    // Logbook Functions
+    function loadLogbook() {
+        const container = document.getElementById('logbookEntries');
+        
+        // Load user filter options
+        const userFilter = document.getElementById('logUserFilter');
+        const uniqueUsers = [...new Set(logs.map(log => log.username))];
+        userFilter.innerHTML = '<option value="">Tüm Kullanıcılar</option>' +
+            uniqueUsers.map(user => `<option value="${user}">${user}</option>`).join('');
+
+        if (logs.length === 0) {
+            container.innerHTML = '<p class="text-muted">Henüz log kaydı yok.</p>';
+            return;
+        }
+
+        displayFilteredLogs();
+    }
+
+    function filterLogs() {
+        displayFilteredLogs();
+    }
+
+    function displayFilteredLogs() {
+        const container = document.getElementById('logbookEntries');
+        const dateFilter = document.getElementById('logDateFilter').value;
+        const userFilter = document.getElementById('logUserFilter').value;
+        const actionFilter = document.getElementById('logActionFilter').value;
+
+        let filteredLogs = logs;
+
+        // Filter by date
+        if (dateFilter) {
+            const filterDate = new Date(dateFilter);
+            filteredLogs = filteredLogs.filter(log => {
+                const logDate = new Date(log.timestamp);
+                return logDate.toDateString() === filterDate.toDateString();
+            });
+        }
+
+        // Filter by user
+        if (userFilter) {
+            filteredLogs = filteredLogs.filter(log => log.username === userFilter);
+        }
+
+        // Filter by action
+        if (actionFilter) {
+            filteredLogs = filteredLogs.filter(log => log.actionType === actionFilter);
+        }
+
+        if (filteredLogs.length === 0) {
+            container.innerHTML = '<p class="text-muted">Filtrelere uygun log kaydı bulunamadı.</p>';
+            return;
+        }
+
+        container.innerHTML = filteredLogs.reverse().map(log => {
+            let iconClass = 'fas fa-info-circle';
+            let badgeClass = 'bg-secondary';
+
+            switch(log.actionType) {
+                case 'login':
+                    iconClass = 'fas fa-sign-in-alt';
+                    badgeClass = 'bg-success';
+                    break;
+                case 'logout':
+                    iconClass = 'fas fa-sign-out-alt';
+                    badgeClass = 'bg-warning';
+                    break;
+                case 'product_created':
+                    iconClass = 'fas fa-plus-circle';
+                    badgeClass = 'bg-primary';
+                    break;
+                case 'product_updated':
+                    iconClass = 'fas fa-edit';
+                    badgeClass = 'bg-info';
+                    break;
+                case 'product_deleted':
+                    iconClass = 'fas fa-trash';
+                    badgeClass = 'bg-danger';
+                    break;
+                case 'stock_adjusted':
+                    iconClass = 'fas fa-warehouse';
+                    badgeClass = 'bg-success';
+                    break;
+                case 'shipment_created':
+                    iconClass = 'fas fa-shipping-fast';
+                    badgeClass = 'bg-primary';
+                    break;
+                case 'shipment_deleted':
+                    iconClass = 'fas fa-undo';
+                    badgeClass = 'bg-warning';
+                    break;
+            }
+
+            return `
+                <div class="log-entry">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="${iconClass} me-2"></i>
+                                <span class="badge ${badgeClass} me-2">${log.actionType}</span>
+                                <strong>${log.username}</strong>
+                            </div>
+                            <p class="mb-1">${log.details}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt"></i> ${formatDate(log.timestamp)}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Enter key handling for login
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const currentPage = document.querySelector('.login-container:not(.hidden)');
+            if (currentPage) {
+                const loginForm = document.getElementById('loginForm');
+                const registerForm = document.getElementById('registerForm');
+                
+                if (!loginForm.classList.contains('hidden')) {
+                    login();
+                } else if (!registerForm.classList.contains('hidden')) {
+                    register();
+                }
+            }
+        }
+    });
+
+    // Auto-save functionality (simulated)
+    setInterval(() => {
+        if (currentUser) {
+            // This would normally save to a real database
+            console.log('Auto-saving data...');
+        }
+    }, 300000); // Every 5 minutes
+
+    </script>
+</body>
+</html>
